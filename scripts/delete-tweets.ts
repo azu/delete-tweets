@@ -58,8 +58,12 @@ export async function deleteTweets(tweetsJsonFilePath: string, deletedTweetsFile
         try {
             await twitter.v1.post(`statuses/destroy/${tweet.id}.json`);
         } catch (error) {
+            if (error.code === 404) {
+                return; // already deleted
+            }
+            console.log("Fail to delete", tweet);
             console.log("Rate Limit? Please wait 2~3 hours");
-            console.error(error);
+            console.log(`Or, if it is already deleted, please add ${tweet.id} to deleted-tweets.txt`);
             throw error;
         }
     };
@@ -72,32 +76,40 @@ export async function deleteTweets(tweetsJsonFilePath: string, deletedTweetsFile
     let totalCount = 0;
     let processCount = 0;
     let skippedCount = 0;
+    let errorCount = 0;
     const queue = new PQueue({
         concurrency: 1
     });
     const spinner = ora("Loading").start();
     queue.on("next", () => {
-        spinner.text = `Process: ${processCount}/${totalCount} Skip: ${skippedCount}`;
+        spinner.text = `Delete: ${processCount}/${totalCount} Skip: ${skippedCount}`;
     });
     for await (const line of lineStream) {
         totalCount++;
         queue.add(async () => {
-            if (processCount > 1) {
+            if (errorCount > 3) {
+                console.log("Error counts is over 3. Stop deleting...");
+                process.exit(1); // force stop
                 return;
             }
-            const tweet: ToDeleteTweetLine = JSON.parse(line);
-            if (deletedTweetsSet.has(tweet.id)) {
-                skippedCount++;
-                return;
+            try {
+                const tweet: ToDeleteTweetLine = JSON.parse(line);
+                if (deletedTweetsSet.has(tweet.id)) {
+                    skippedCount++;
+                    return;
+                }
+                processCount++;
+                await deleteTweet(tweet);
+                await appendDeletedTweetId(deletedTweetsFilePath, tweet.id);
+                await waitFor(500);
+            } catch (error) {
+                errorCount++;
+                throw error;
             }
-            processCount++;
-            await deleteTweet(tweet);
-            await appendDeletedTweetId(deletedTweetsFilePath, tweet.id);
-            await waitFor(500);
         });
     }
     await queue.onIdle();
-    spinner.succeed(`Process: ${processCount}/${totalCount} Skip: ${skippedCount}`);
+    spinner.succeed(`Complete to delete: ${processCount}/${totalCount} Skip: ${skippedCount}`);
 }
 
 const selfScriptFilePath = url.fileURLToPath(import.meta.url);
