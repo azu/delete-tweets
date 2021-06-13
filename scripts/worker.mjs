@@ -13,6 +13,7 @@ import kuromojin from "kuromojin";
 // @ts-ignore
 import analyze from "negaposi-analyzer-ja";
 import path from "path";
+import fsStream from "fs";
 import { fileURLToPath } from "url";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -91,7 +92,7 @@ const checkNegaposi = async (tweet) => {
     };
 };
 
-const readDisllowList = (() => {
+const DISALLOW_LIST = (() => {
     try {
         const yaml = fsStream.readFileSync(path.join(__dirname, "../disallow.yaml"), "utf-8");
         const disallowList = JsYaml.loadAll(yaml);
@@ -108,12 +109,12 @@ const readDisllowList = (() => {
  * @returns {Promise<import(("./detect.ts").CheckResult>}
  */
 const checkDisallow = async (tweet) => {
-    if (readDisllowList.length === 0) {
+    if (DISALLOW_LIST.length === 0) {
         return {
             ok: true
         };
     }
-    const matches = regexpStringMatcher.matchPatterns(tweet.text, readDisllowList);
+    const matches = regexpStringMatcher.matchPatterns(tweet.text, DISALLOW_LIST);
     if (matches.length > 0) {
         return {
             ok: false,

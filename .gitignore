@@ -1,4 +1,5 @@
 allow.yaml
+allow-id.yaml
 disallow.yaml
 data/*
 twitter-archives/*

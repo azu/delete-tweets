@@ -4,13 +4,33 @@ Delete tweets and 日本語の補助ツール
 
 ## Install
 
-Install with [npm](https://www.npmjs.com/):
+Use yarn.
 
-    npm install @azu/delete-tweets
+    yarn install
+    yarn bootstrap
 
 ## Usage
 
-- [ ] Write usage instructions
+### Import Archive
+
+    yarn import-twitter-archives
+
+### Detect tweets which will be deleted
+
+    yarn detect
+
+### Delete tweets
+
+    yarn delete-tweets # It is actual delete tweets
+
+## Options
+
+- `allow.yaml`
+    - Allow words list
+- `allow-id.yaml`
+    - Allow tweet's id list
+- `disallow.yaml`
+    - Disallow words list
 
 ## Changelog
 

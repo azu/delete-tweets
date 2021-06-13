@@ -3,8 +3,6 @@ import path from "path";
 import split2 from "split2";
 import * as url from "url";
 import { fileURLToPath } from "url";
-// @ts-ignore
-import nodeEndpoint from "comlink/dist/esm/node-adapter.mjs";
 import ora from "ora";
 import PQueue from "p-queue";
 // @ts-ignore
@@ -12,6 +10,7 @@ import { Piscina } from "piscina";
 import { LineTweet } from "./types/output";
 import fs from "fs/promises";
 import dayjs from "dayjs";
+import JsYaml from "js-yaml";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const dataDir = path.join(__dirname, "../data");
@@ -28,9 +27,43 @@ export type ToDeleteTweetLine = {
     reason: string;
 };
 
+export const getDeletedTweetsSet = async (deletedTweetsFilePath: string): Promise<Set<string>> => {
+    return new Promise<Set<string>>(async (resolve, reject) => {
+        if (!fsStream.existsSync(deletedTweetsFilePath)) {
+            return reject(new Error("No file"));
+        }
+        const deletedStream = fsStream
+            .createReadStream(deletedTweetsFilePath, {
+                encoding: "utf-8"
+            })
+            .pipe(split2())
+            .on("error", reject);
+        const deletedSet = new Set<string>();
+        for await (const id of deletedStream) {
+            deletedSet.add(id as string);
+        }
+        resolve(deletedSet);
+    }).catch((_) => {
+        return new Set<string>();
+    });
+};
+
+const ALLOW_ID_SET: Set<string> = (() => {
+    try {
+        const yaml = fsStream.readFileSync(path.join(__dirname, "../allow-id.yaml"), "utf-8");
+        const allowIdList = JsYaml.loadAll(yaml);
+        if (!Array.isArray(allowIdList)) {
+            console.log(new Error("disallow.yaml should be an array"));
+        }
+        return new Set<string>(...allowIdList[0]);
+    } catch {
+        return new Set<string>();
+    }
+})();
 // 3年前以前のデータが対象
 const TARGET_BEFORE_DATE_TIMESTAMP = dayjs().subtract(3, "year");
-export async function detect(tweetsJsonFilePath: string) {
+
+export async function detect(tweetsJsonFilePath: string, deletedTweetsJsonFilePath: string) {
     const inputStream = fsStream.createReadStream(tweetsJsonFilePath, {
         encoding: "utf-8"
     });
@@ -38,6 +71,7 @@ export async function detect(tweetsJsonFilePath: string) {
 
     let totalCount = 0;
     let processCount = 0;
+    let skippedCount = 0;
     let ngCount = 0;
     const queue = new PQueue({
         concurrency: 16
@@ -45,19 +79,26 @@ export async function detect(tweetsJsonFilePath: string) {
     const spinner = ora("Loading").start();
     const addedSet = new Set<string>();
     queue.on("next", () => {
-        spinner.text = `Process: ${processCount}/${totalCount} NG: ${ngCount}`;
+        spinner.text = `Process: ${processCount}/${totalCount} NG: ${ngCount} Skip: ${skippedCount}`;
     });
     const piscina = new Piscina({
         filename: new URL("./worker.mjs", import.meta.url).href,
         maxQueue: "auto"
     });
+    const deletedTweetsSet = await getDeletedTweetsSet(deletedTweetsJsonFilePath);
     const willDeleteTweets: ToDeleteTweetLine[] = [];
     for await (const line of lineStream) {
         totalCount++;
         queue.add(async () => {
             const tweet: LineTweet = JSON.parse(line);
+            if (ALLOW_ID_SET.has(tweet.id)) {
+                return skippedCount++; // allow tweet id
+            }
             if (dayjs(tweet.timestamp).isAfter(TARGET_BEFORE_DATE_TIMESTAMP)) {
-                return;
+                return skippedCount++;
+            }
+            if (deletedTweetsSet.has(tweet.id)) {
+                return skippedCount++; // already deleted
             }
             return piscina.run(tweet).then((results: CheckResult[]) => {
                 processCount++;
@@ -88,7 +129,8 @@ export async function detect(tweetsJsonFilePath: string) {
 const selfScriptFilePath = url.fileURLToPath(import.meta.url);
 if (process.argv[1] === selfScriptFilePath) {
     const tweetsJsonFilePath = path.join(dataDir, "tweets.json");
-    detect(tweetsJsonFilePath).catch((error) => {
+    const deletedTweetsJsonFilePath = path.join(dataDir, "deleted-tweets.txt");
+    detect(tweetsJsonFilePath, deletedTweetsJsonFilePath).catch((error) => {
         console.error(error);
         process.exit(1);
     });
