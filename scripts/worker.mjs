@@ -70,7 +70,12 @@ const textlint = (tweet) => {
  * @returns {Promise<import(("./detect.ts").CheckResult>}
  */
 const checkNegaposi = async (tweet) => {
-    const tokens = await kuromojin.tokenize(tweet.text || "");
+    if (!tweet.text) {
+        return {
+            ok: true
+        }
+    }
+    const tokens = await kuromojin.tokenize(tweet.text);
     const score = analyze(tokens, {
         // 辞書にない単語のスコア
         unknownWordRank: 0,

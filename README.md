@@ -32,6 +32,32 @@ Use yarn.
 - `disallow.yaml`
     - Disallow words list
 
+## Debug
+
+[jq](https://stedolan.github.io/jq/) support JSONLD.
+
+```shell
+cat data/will-delete-tweets.json | jq ".text"
+```
+
+Group by error's `reason`:
+
+```shell
+cat data/will-delete-tweets.json| jq -s "group_by(.reason)[] |  {(.[0].reason): [.[] | .]}" > data/group_by.json
+```
+
+Group by error's `reason` and count it 
+
+```shell
+cat data/will-delete-tweets.json| jq -s "[group_by(.reason)[] | {reason: .[0].reason, count: length }] | sort_by(.count) | reverse" > data/group_by_count.json
+```
+
+Show specific reason
+
+```shell
+cat data/will-delete-tweets.json| jq -s 'group_by(.reason)[] | select(.[0].reason | contains("理由")) | .[].text'
+```
+
 ## Changelog
 
 See [Releases page](https://github.com/azu/delete-tweets/releases).
