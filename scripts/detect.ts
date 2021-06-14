@@ -11,9 +11,41 @@ import { LineTweet } from "./types/output";
 import fs from "fs/promises";
 import dayjs from "dayjs";
 import JsYaml from "js-yaml";
-
 import os from "os";
+import meow from "meow";
 
+export const cli = meow(
+    `
+    Usage
+      $ yarn detect
+ 
+    Options
+      --fromDate    [String] from Date string.
+      --toDate      [String] from to string.
+
+    Examples
+      # ALl
+      $ yarn detect
+      # 2015-01-01 ~ Now
+      $ yarn detect --fromDate 2015-01-01
+      # 2015-01-01 ~ 2016-01-01
+      $ yarn detect --fromDate 2015-01-01 --toDate 2016-01-01
+
+`,
+    {
+        importMeta: import.meta,
+        flags: {
+            fromDate: {
+                type: "string"
+            },
+            toDate: {
+                type: "string"
+            }
+        },
+        autoHelp: true,
+        autoVersion: true
+    }
+);
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const dataDir = path.join(__dirname, "../data");
 export type CheckResult = {
@@ -62,10 +94,18 @@ const ALLOW_ID_SET: Set<string> = (() => {
         return new Set<string>();
     }
 })();
-// 3年前以前のデータが対象
-const TARGET_BEFORE_DATE_TIMESTAMP = dayjs().subtract(3, "year");
 
-export async function detect(tweetsJsonFilePath: string, deletedTweetsJsonFilePath: string) {
+export async function detect({
+    tweetsJsonFilePath,
+    deletedTweetsJsonFilePath,
+    fromDate,
+    toDate
+}: {
+    fromDate: Date;
+    toDate: Date;
+    tweetsJsonFilePath: string;
+    deletedTweetsJsonFilePath: string;
+}) {
     const inputStream = fsStream.createReadStream(tweetsJsonFilePath, {
         encoding: "utf-8"
     });
@@ -75,12 +115,15 @@ export async function detect(tweetsJsonFilePath: string, deletedTweetsJsonFilePa
     let processCount = 0;
     let skippedCount = 0;
     let ngCount = 0;
-    console.log("os.cpus().length", os.cpus().length);
     const queue = new PQueue({
         concurrency: os.cpus().length
     });
-    const spinner = ora("Loading").start();
     const addedSet = new Set<string>();
+
+    const fromDateTimeStamp = fromDate.getTime();
+    const toDateTimeStamp = toDate.getTime();
+    console.log(`Searching tweets: ${fromDate} ~ ${toDate} `);
+    const spinner = ora("Loading").start();
     queue.on("next", () => {
         spinner.text = `Process: ${processCount + skippedCount}/${totalCount} NG: ${ngCount} Skip: ${skippedCount}`;
     });
@@ -97,27 +140,33 @@ export async function detect(tweetsJsonFilePath: string, deletedTweetsJsonFilePa
             if (ALLOW_ID_SET.has(tweet.id)) {
                 return skippedCount++; // allow tweet id
             }
-            if (dayjs(tweet.timestamp).isBefore(TARGET_BEFORE_DATE_TIMESTAMP)) {
+            if (tweet.timestamp < fromDateTimeStamp || tweet.timestamp > toDateTimeStamp) {
                 return skippedCount++;
             }
             if (deletedTweetsSet.has(tweet.id)) {
                 return skippedCount++; // already deleted
             }
-            return piscina.run(tweet).then((results: CheckResult[]) => {
-                processCount++;
-                const badResults = results.filter((result) => !result.ok);
-                if (badResults.length !== 0) {
-                    if (addedSet.has(tweet.id)) {
-                        return; // already added
+            return piscina
+                .run(tweet)
+                .then((results: CheckResult[]) => {
+                    processCount++;
+                    const badResults = results.filter((result) => !result.ok);
+                    if (badResults.length !== 0) {
+                        if (addedSet.has(tweet.id)) {
+                            return; // already added
+                        }
+                        ngCount++;
+                        willDeleteTweets.push({
+                            ...tweet,
+                            reason: badResults.map((result) => result.message).join(", ")
+                        });
+                        addedSet.add(tweet.id);
                     }
-                    ngCount++;
-                    willDeleteTweets.push({
-                        ...tweet,
-                        reason: badResults.map((result) => result.message).join(", ")
-                    });
-                    addedSet.add(tweet.id);
-                }
-            });
+                })
+                .catch((error) => {
+                    console.log("Skip: Error on the tweet", tweet, error);
+                    skippedCount++;
+                });
         });
     }
     await queue.onIdle();
@@ -133,7 +182,14 @@ const selfScriptFilePath = url.fileURLToPath(import.meta.url);
 if (process.argv[1] === selfScriptFilePath) {
     const tweetsJsonFilePath = path.join(dataDir, "tweets.json");
     const deletedTweetsJsonFilePath = path.join(dataDir, "deleted-tweets.txt");
-    detect(tweetsJsonFilePath, deletedTweetsJsonFilePath).catch((error) => {
+    const fromDate = cli.flags.fromDate ? dayjs(cli.flags.fromDate, "YYYY-MM-DD").toDate() : dayjs(0).toDate();
+    const toDate = cli.flags.toDate ? dayjs(cli.flags.toDate, "YYYY-MM-DD").toDate() : dayjs().toDate();
+    detect({
+        fromDate,
+        toDate,
+        tweetsJsonFilePath: tweetsJsonFilePath,
+        deletedTweetsJsonFilePath: deletedTweetsJsonFilePath
+    }).catch((error) => {
         console.error(error);
         process.exit(1);
     });

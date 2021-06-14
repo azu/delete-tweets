@@ -76,7 +76,7 @@ const checkNegaposi = async (tweet) => {
         };
     }
     const tokens = await kuromojin.tokenize(tweet.text).catch(error => {
-        console.log("tokenize error", tweet, error);
+        process.env.DEBUG && console.log("tokenize error", tweet, error);
         return [];
     });
     const score = analyze(tokens, {

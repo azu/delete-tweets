@@ -26,9 +26,20 @@ Use yarn.
 
 ### Detect tweets which will be deleted
 
+`yarn detect` check your tweets if it should be deleted.
+
+    # all tweets
     yarn detect
+    # 2015-01-01 ~ Now
+    $ yarn detect --fromDate 2015-01-01
+    # 2015-01-01 ~ 2016-01-01
+    $ yarn detect --fromDate 2015-01-01 --toDate 2016-01-01
+
+`yarn detect` support `--fromDate YYYY-MM-DD` and `--toDate YYYY-MM-DD`.
 
 ### Delete tweets
+
+Delete detected Tweets per 0.5 seconds.
 
     yarn delete-tweets # It is actual delete tweets
 
@@ -43,8 +54,8 @@ Use yarn.
 
 Steps
 
-1. `allow-id.yaml` check tewet.id
-2. `disallow.yaml` check tweet.text
+1. `allow-id.yaml` check `tewet.id`
+2. `disallow.yaml` check `tweet.text`
 3. `allow.yaml` check the disallowed word
   - if this word is allowed, skip it
 

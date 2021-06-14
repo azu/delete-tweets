@@ -82,6 +82,7 @@
     "dotenv": "^10.0.0",
     "js-yaml": "^4.1.0",
     "kuromojin": "^3.0.0",
+    "meow": "^10.0.1",
     "negaposi-analyzer-ja": "^1.0.1",
     "npm": "^6.14.13",
     "ora": "^5.4.1",
