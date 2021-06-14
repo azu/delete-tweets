@@ -37,7 +37,7 @@ Use yarn.
 [jq](https://stedolan.github.io/jq/) support JSONLD.
 
 ```shell
-cat data/will-delete-tweets.json | jq ".text"
+cat data/will-delete-tweets.json | jq -s ".[].text"
 ```
 
 Group by error's `reason`:
