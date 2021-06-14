@@ -73,9 +73,12 @@ const checkNegaposi = async (tweet) => {
     if (!tweet.text) {
         return {
             ok: true
-        }
+        };
     }
-    const tokens = await kuromojin.tokenize(tweet.text);
+    const tokens = await kuromojin.tokenize(tweet.text).catch(error => {
+        console.log("tokenize error", tweet, error);
+        return [];
+    });
     const score = analyze(tokens, {
         // 辞書にない単語のスコア
         unknownWordRank: 0,
@@ -97,6 +100,18 @@ const checkNegaposi = async (tweet) => {
     };
 };
 
+const ALLOW_LIST = (() => {
+    try {
+        const yaml = fsStream.readFileSync(path.join(__dirname, "../allow.yaml"), "utf-8");
+        const allowList = JsYaml.loadAll(yaml);
+        if (!Array.isArray(allowList)) {
+            console.log(new Error("disallow.yml should be an array"));
+        }
+        return allowList[0];
+    } catch {
+        return [];
+    }
+})();
 const DISALLOW_LIST = (() => {
     try {
         const yaml = fsStream.readFileSync(path.join(__dirname, "../disallow.yaml"), "utf-8");
@@ -120,10 +135,14 @@ const checkDisallow = async (tweet) => {
         };
     }
     const matches = regexpStringMatcher.matchPatterns(tweet.text, DISALLOW_LIST);
-    if (matches.length > 0) {
+    // remove allowed words
+    const matchesWithoutAllowed = matches.filter(match => {
+        return regexpStringMatcher.matchPatterns(match.match, ALLOW_LIST).length === 0;
+    });
+    if (matchesWithoutAllowed.length > 0) {
         return {
             ok: false,
-            message: `NGワードの 「${matches.map(match => match.match).join("」,「")}」 が含まれています`
+            message: `NGワードの 「${matchesWithoutAllowed.map(match => match.match).join("」,「")}」 が含まれています`
         };
     }
     return {

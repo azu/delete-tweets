@@ -41,6 +41,13 @@ Use yarn.
 - `disallow.yaml`
     - Disallow words list
 
+Steps
+
+1. `allow-id.yaml` check tewet.id
+2. `disallow.yaml` check tweet.text
+3. `allow.yaml` check the disallowed word
+  - if this word is allowed, skip it
+
 ## Debug
 
 [jq](https://stedolan.github.io/jq/) support JSONLD.
@@ -52,19 +59,25 @@ cat data/will-delete-tweets.json | jq -s ".[].text"
 Group by error's `reason`:
 
 ```shell
-cat data/will-delete-tweets.json| jq -s "group_by(.reason)[] |  {(.[0].reason): [.[] | .]}"
+cat data/will-delete-tweets.json | jq -s "group_by(.reason)[] |  {(.[0].reason): [.[] | .]}"
 ```
 
 Group by error's `reason` and count it 
 
 ```shell
-cat data/will-delete-tweets.json| jq -s "[group_by(.reason)[] | {reason: .[0].reason, count: length }] | sort_by(.count) | reverse"
+cat data/will-delete-tweets.json | jq -s "[group_by(.reason)[] | {reason: .[0].reason, count: length }] | sort_by(.count) | reverse"
 ```
 
 Show specific reason
 
 ```shell
-cat data/will-delete-tweets.json| jq -s 'group_by(.reason)[] | select(.[0].reason | contains("理由")) | .[].text'
+cat data/will-delete-tweets.json | jq -s 'group_by(.reason)[] | select(.[0].reason | contains("理由")) | .[].text'
+```
+
+Remove specific errors
+
+```shell
+cat data/will-delete-tweets.json | jq -s -c 'group_by(.reason)[] | select(.[0].reason | contains("感情極性値") | not) | .[]' > data/will-delete-tweets.updated.json 
 ```
 
 ## Changelog

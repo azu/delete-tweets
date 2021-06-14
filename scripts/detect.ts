@@ -12,6 +12,8 @@ import fs from "fs/promises";
 import dayjs from "dayjs";
 import JsYaml from "js-yaml";
 
+import os from "os";
+
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const dataDir = path.join(__dirname, "../data");
 export type CheckResult = {
@@ -73,13 +75,14 @@ export async function detect(tweetsJsonFilePath: string, deletedTweetsJsonFilePa
     let processCount = 0;
     let skippedCount = 0;
     let ngCount = 0;
+    console.log("os.cpus().length", os.cpus().length);
     const queue = new PQueue({
-        concurrency: 16
+        concurrency: os.cpus().length
     });
     const spinner = ora("Loading").start();
     const addedSet = new Set<string>();
     queue.on("next", () => {
-        spinner.text = `Process: ${processCount}/${totalCount} NG: ${ngCount} Skip: ${skippedCount}`;
+        spinner.text = `Process: ${processCount + skippedCount}/${totalCount} NG: ${ngCount} Skip: ${skippedCount}`;
     });
     const piscina = new Piscina({
         filename: new URL("./worker.mjs", import.meta.url).href,
@@ -94,7 +97,7 @@ export async function detect(tweetsJsonFilePath: string, deletedTweetsJsonFilePa
             if (ALLOW_ID_SET.has(tweet.id)) {
                 return skippedCount++; // allow tweet id
             }
-            if (dayjs(tweet.timestamp).isAfter(TARGET_BEFORE_DATE_TIMESTAMP)) {
+            if (dayjs(tweet.timestamp).isBefore(TARGET_BEFORE_DATE_TIMESTAMP)) {
                 return skippedCount++;
             }
             if (deletedTweetsSet.has(tweet.id)) {
@@ -118,7 +121,7 @@ export async function detect(tweetsJsonFilePath: string, deletedTweetsJsonFilePa
         });
     }
     await queue.onIdle();
-    spinner.succeed("Complete:" + processCount + " NG: " + ngCount);
+    spinner.succeed(`Complete:${totalCount} NG: ${ngCount} Skip: ${skippedCount}`);
     await fs.writeFile(
         path.join(dataDir, "will-delete-tweets.json"),
         willDeleteTweets.map((line) => JSON.stringify(line)).join("\n"),
