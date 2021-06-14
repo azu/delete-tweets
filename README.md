@@ -43,13 +43,13 @@ cat data/will-delete-tweets.json | jq ".text"
 Group by error's `reason`:
 
 ```shell
-cat data/will-delete-tweets.json| jq -s "group_by(.reason)[] |  {(.[0].reason): [.[] | .]}" > data/group_by.json
+cat data/will-delete-tweets.json| jq -s "group_by(.reason)[] |  {(.[0].reason): [.[] | .]}"
 ```
 
 Group by error's `reason` and count it 
 
 ```shell
-cat data/will-delete-tweets.json| jq -s "[group_by(.reason)[] | {reason: .[0].reason, count: length }] | sort_by(.count) | reverse" > data/group_by_count.json
+cat data/will-delete-tweets.json| jq -s "[group_by(.reason)[] | {reason: .[0].reason, count: length }] | sort_by(.count) | reverse"
 ```
 
 Show specific reason
