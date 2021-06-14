@@ -2,6 +2,15 @@
 
 Delete tweets and 日本語の補助ツール
 
+## Features
+
+- Twitterの[データアーカイブ](https://help.twitter.com/ja/managing-your-account/how-to-download-your-twitter-archive)を使った削除の対応
+- 自然言語、感情極性値ベースのフィルターでの絞り込みの対応
+  - 許可リスト、不許可リスト、ネガティブポジティブ(感情極性値ベース)のフィルタリング、[放送禁止用語](https://github.com/hata6502/textlint-rule-no-hoso-kinshi-yogo)、[不適切表現](https://github.com/textlint-ja/textlint-rule-ja-no-inappropriate-words)
+- 絞り込んだ結果のみをTwitterから削除
+- 削除済みの履歴を使った絞り込みのキャッシュ
+  - Tweetsを削除して、辞書を更新して、また絞り込みと何度も繰り返し処理ができる
+
 ## Install
 
 Use yarn.
