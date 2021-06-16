@@ -163,6 +163,9 @@ TWITTER_ACCESS_SECRET="x"
 :warning: Tweetsを削除すると復元はできません。 `data/will-delete-tweets.json` には削除したい対象だけを残してください。
 TwitterのAPIを大量に叩く可能性があるので、自己責任で実行してください。
 
+:memo: 削除したTweetsは`data/deleted-twwets.txt`にIDが記録されます。
+途中で削除を停止した場合も続きから実行できます。
+
 ## Debug
 
 [jq](https://stedolan.github.io/jq/) support JSONLD.
