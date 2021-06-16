@@ -83,7 +83,7 @@ twitter-archives/
 #### `disallow.yaml`
 
 Tweetsに含まれていたら削除対象とする辞書を定義します。
-辞書は、文字列または[RegExp-like String](https://github.com/textlint/regexp-string-matcher#regexp-like-string)ベースの正規表現の配列を指定できます。
+不許可リストには、文字列または[RegExp-like String](https://github.com/textlint/regexp-string-matcher#regexp-like-string)ベースの正規表現の配列を指定できます。
 
 マッチ対象は `tweeet.text` の値のみです。
 
@@ -98,6 +98,7 @@ Tweetsに含まれていたら削除対象とする辞書を定義します。
 #### `allow.yaml`
 
 `disallow.yaml`やtextlintでNGとなった場合にも、マッチした範囲が`allow.yaml`で許可されている場合は、削除対象から外せます。
+許可リストには、文字列または[RegExp-like String](https://github.com/textlint/regexp-string-matcher#regexp-like-string)ベースの正規表現の配列を指定できます。
 
 :memo: `allow.yaml`で定義した辞書が`tweet.text` に含まれているから無条件にOKではなく、あくまでNGとなった範囲がが許可された範囲に含まれていれば、OKという実装になってる
 
