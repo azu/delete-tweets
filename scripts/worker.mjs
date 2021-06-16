@@ -134,10 +134,11 @@ const checkDisallow = async (tweet) => {
             ok: true
         };
     }
-    const matches = regexpStringMatcher.matchPatterns(tweet.text, DISALLOW_LIST);
+    const matchesDisallow = regexpStringMatcher.matchPatterns(tweet.text, DISALLOW_LIST);
     // remove allowed words
-    const matchesWithoutAllowed = matches.filter(match => {
-        return regexpStringMatcher.matchPatterns(match.match, ALLOW_LIST).length === 0;
+    const matchesAllow = regexpStringMatcher.matchPatterns(tweet.text, ALLOW_LIST);
+    const matchesWithoutAllowed = matchesDisallow.filter(disallowMatch => {
+        return !matchesAllow.some(allowMatch => allowMatch.startIndex <= disallowMatch.startIndex && disallowMatch.endIndex <= allowMatch.endIndex);
     });
     if (matchesWithoutAllowed.length > 0) {
         return {

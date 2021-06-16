@@ -1,6 +1,6 @@
 # @azu/delete-tweets
 
-Delete tweets and 日本語の補助ツール
+Tweetsの削除と削除対象のフィルターをする日本語の補助ツール。
 
 ## Features
 
@@ -20,13 +20,34 @@ Use yarn.
 
 ## Usage
 
+次のステップでTweetsを削除します。
+
+1. Import Archive - TwitterのアーカイブからTweetsデータの作成
+2. Detect Tweets - Tweetsデータをフィルタリングして削除候補のTweetsデータを作成
+3. Delete Tweets - 削除対象のTweetsを削除
+
+
+
 ### Import Archive
+
+1. [Twitter archive](https://help.twitter.com/en/managing-your-account/how-to-download-your-twitter-archive)を参考にTwitterのアーカイブをリクエストします
+2. Twitterのアーカイブ(`twitter-*.zip`)をダウンロードして展開します
+3. 中に含まれる `tweeet*.js` を `twitter-archives/` ディレクトリにコピーします
+
+```
+twitter-archives/
+├── tweet.js
+├── tweet-part1.js
+└── tweet-part2.js
+```
+
+4. 次のコマンドを実行して、`tweet*.js` をインポートして `data/tweets.json` を作成します
 
     yarn import-twitter-archives
 
-### Detect tweets which will be deleted
+### Detect Tweets
 
-`yarn detect` check your tweets if it should be deleted.
+`yarn detect` コマンドで、削除候補のTweetsデータを `data/will-delete-tweets.json` として作成できます。
 
     # all tweets
     yarn detect
@@ -35,29 +56,92 @@ Use yarn.
     # 2015-01-01 ~ 2016-01-01
     $ yarn detect --fromDate 2015-01-01 --toDate 2016-01-01
 
-`yarn detect` support `--fromDate YYYY-MM-DD` and `--toDate YYYY-MM-DD`.
+`yarn detect`は `--fromDate YYYY-MM-DD` と `--toDate YYYY-MM-DD` で対象のTweetsの日付範囲を指定できます。
+
+その他にも オプション で削除候補に追加、削除できます。
+
+### Detect Options
+
+それぞれのファイルに定義することで、自動的に`yarn detect`が処理します。
+
+#### `allow-id.yaml`
+
+削除しないTweetsの`id`を指定してます。
+
+たとえば、`https://twitter.com/twitter/status/123456765432` を削除対象から外す場合は次のように定義できます。
+
+```yaml
+- 123456765432
+```
+
+#### `disallow.yaml`
+
+Tweetsに含まれていたら削除対象とする辞書を定義します。
+辞書は、文字列または[RegExp-like String](https://github.com/textlint/regexp-string-matcher#regexp-like-string)ベースの正規表現の配列を指定できます。
+
+マッチ対象は `tweeet.text` の値のみです。
+
+```yaml
+- /[亜-熙ぁ-んァ-ヶ]w+(\s|$)/ # www みたいなやつ
+- /(?<!く)ださい/
+- /これだけ知って(おけ|れば)/
+- 嘘つき
+- ぼったくり
+```
+
+#### `allow.yaml`
+
+`disallow.yaml`やtextlintでNGとなった場合にも、マッチした範囲が`allow.yaml`で許可されている場合は、削除対象から外せます。
+
+:memo: `allow.yaml`で定義した辞書が`tweet.text` に含まれているから無条件にOKではなく、あくまでNGとなった範囲がが許可された範囲に含まれていれば、OKという実装になってる
+
+```yaml
+- エディター
+- ダークソウル
+- /example.com\/.*/
+```
+
+例) 次のように`disallow.yaml`で `クソ` という単語をNGとしてしまうと、`ダークソウル`もNGとなってしまう。
+この場合は、`allow.yaml` に `ダークソウル` を定義することで、`ダークソウル`は許可される。
+
+`disallow.yaml`:
+
+```yaml
+- クソ
+```
+
+`allow.yaml`:
+
+```yaml
+- ダークソウル
+```
+
+実装の詳細:
+
+`disallow.yaml`によって、2から3までの範囲がNGとして報告される。
+`allow.yaml`によって、0から5までの範囲はたとえNGがあっても例外として無視する。
+
+```shell
+|０|１|２|３|４|５|６|７|８|９|
+------------------ 対象のTweetのtext
+|ダ|ー|ク|ソ|ウ|ル|は|ゲ|ー|ム|
+------------------ disallow.yamlの定義
+      |ク|ソ|
+------------------ allow.yamlの定義
+|ダ|ー|ク|ソ|ウ|ル|
+```
+
+Steps:
+
+1. `allow-id.yaml` check `tewet.id`
+2. `disallow.yaml` check `tweet.text`
+3. `allow.yaml` check the disallowed word
 
 ### Delete tweets
 
 Delete detected Tweets per 0.5 seconds.
 
     yarn delete-tweets # It is actual delete tweets
-
-## Options
-
-- `allow.yaml`
-    - Allow words list
-- `allow-id.yaml`
-    - Allow tweet's id list
-- `disallow.yaml`
-    - Disallow words list
-
-Steps
-
-1. `allow-id.yaml` check `tewet.id`
-2. `disallow.yaml` check `tweet.text`
-3. `allow.yaml` check the disallowed word
-  - if this word is allowed, skip it
 
 ## Debug
 
