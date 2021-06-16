@@ -12,7 +12,9 @@ function replaceRange({
     end: number;
     substitute: string;
 }) {
-    return text.substring(0, start) + substitute + text.substring(end);
+    // emoji support
+    const codePoints = [...text];
+    return codePoints.slice(0, start).join("") + substitute + codePoints.slice(end).join("");
 }
 
 const rewriteTextWithUrls = (text: string, urls: ArchivesURL[] = []): string => {
