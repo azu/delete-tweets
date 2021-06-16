@@ -13,7 +13,7 @@ Tweetsの削除と削除対象のフィルターをする日本語の補助ツ�
 
 ## Install
 
-Use yarn.
+[Yarn](https://classic.yarnpkg.com/en/)を使ってインストールして、`yarn bootstrap`を実行してください。
 
     yarn install
     yarn bootstrap
