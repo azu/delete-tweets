@@ -2,6 +2,8 @@
 
 Tweetsの削除と削除対象のフィルターをする日本語の補助ツール。
 
+:warning: 削除候補の推定は基本的に過剰にかかるようになっています。細かいところは辞書などで調整してください。
+
 ## Features
 
 - Twitterの[データアーカイブ](https://help.twitter.com/ja/managing-your-account/how-to-download-your-twitter-archive)を使った削除の対応
