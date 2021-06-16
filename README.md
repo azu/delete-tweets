@@ -164,7 +164,7 @@ TWITTER_ACCESS_SECRET="x"
 TwitterのAPIを大量に叩く可能性があるので、自己責任で実行してください。
 
 :memo: 削除したTweetsは`data/deleted-twwets.txt`にIDが記録されます。
-途中で削除を停止した場合も続きから実行できます。
+途中で削除を停止した場合も続きから実行できます。Rate Limitにかかった場合は自動で停止するつもりですが、そうじゃなかったらIssueを作ってください。
 
 ## Debug
 
