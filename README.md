@@ -158,7 +158,7 @@ TWITTER_ACCESS_SECRET="x"
 
 `yarn delete-tweets` を実行すると、 `data/will-delete-tweets.json` に書かれたTweetsを0.5秒間隔で削除していきます。
 
-    yarn delete-tweets # It is actual delete tweets
+    yarn delete-tweets # It delete tweets actually
 
 :warning: Tweetsを削除すると復元はできません。 `data/will-delete-tweets.json` には削除したい対象だけを残してください。
 TwitterのAPIを大量に叩く可能性があるので、自己責任で実行してください。
