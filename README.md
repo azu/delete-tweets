@@ -147,7 +147,7 @@ Steps:
 
 `yarn detect`で作成した `data/will-delete-tweets.json` にかかれているTweetsを実際に削除します。
 
-`.env` ファイルを作成し、Twitter V2 APIのクライアントのAPI KeyとAccess Tokenを入れて下さい。
+`.env` ファイルを作成し、[Twitter V2 APIのクライアント](https://developer.twitter.com)を作成して、そのクライアントのAPI KeyとAccess Tokenを入れて下さい。
 
 ```
 TWITTER_APP_KEY="x"
