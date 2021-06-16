@@ -33,7 +33,7 @@
     "src/"
   ],
   "scripts": {
-    "bootstrap": "download-negaposi-dict",
+    "bootstrap": "download-negaposi-dict && node bootstrap.js",
     "import-twitter-archives": "node --loader ts-node/esm ./scripts/import-twitter-archives.ts",
     "detect": "node --loader ts-node/esm ./scripts/detect.ts",
     "delete-tweets": "node --loader ts-node/esm ./scripts/delete-tweets.ts",
