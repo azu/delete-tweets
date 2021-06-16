@@ -145,9 +145,23 @@ Steps:
 
 ### Delete tweets
 
-Delete detected Tweets per 0.5 seconds.
+`yarn detect`で作成した `data/will-delete-tweets.json` にかかれているTweetsを実際に削除します。
+
+`.env` ファイルを作成し、Twitter V2 APIのクライアントのAPI KeyとAccess Tokenを入れて下さい。
+
+```
+TWITTER_APP_KEY="x"
+TWITTER_APP_SECRET="x"
+TWITTER_ACCESS_TOKEN="x"
+TWITTER_ACCESS_SECRET="x"
+```
+
+`yarn delete-tweets` を実行すると、 `data/will-delete-tweets.json` に書かれたTweetsを0.5秒間隔で削除していきます。
 
     yarn delete-tweets # It is actual delete tweets
+
+:warning: Tweetsを削除すると復元はできません。 `data/will-delete-tweets.json` には削除したい対象だけを残してください。
+TwitterのAPIを大量に叩く可能性があるので、自己責任で実行してください。
 
 ## Debug
 
