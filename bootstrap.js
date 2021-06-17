@@ -6,6 +6,9 @@ import * as path from "path";
 const __filename = url.fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
+await fsP.mkdir(path.join(__dirname, "twitter-archives"), {
+    recursive: true
+});
 // .env.example → .eng
 if (!fs.existsSync(path.join(__dirname, ".env"))) {
     await fsP.copyFile(path.join(__dirname, ".env.example"), path.join(__dirname, ".env"));
