@@ -37,6 +37,7 @@
     "import-twitter-archives": "node --loader ts-node/esm ./scripts/import-twitter-archives.ts",
     "detect": "node --loader ts-node/esm ./scripts/detect.ts",
     "delete-tweets": "node --loader ts-node/esm ./scripts/delete-tweets.ts",
+    "test-detect": "node --loader ts-node/esm ./scripts/test-detect.ts",
     "test": "mocha",
     "format": "prettier --write \"**/*.{js,jsx,ts,tsx,css}\"",
     "prepare": "git config --local core.hooksPath .githooks",

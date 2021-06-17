@@ -201,6 +201,15 @@ Remove specific errors
 cat data/will-delete-tweets.json | jq -s -c 'group_by(.reason)[] | select(.[0].reason | contains("感情極性値") | not) | .[]' > data/will-delete-tweets.updated.json 
 ```
 
+Test a text from stdin
+
+```shell
+echo "いやらしい文章" | yarn test-detect
+# 感情極性値が0.3未満
+# [ 'textlint-rule-ja-no-inappropriate-words: 不適切表現「いやらしい」が含まれています。' ]
+
+ ```
+
 ## Changelog
 
 See [Releases page](https://github.com/azu/delete-tweets/releases).
