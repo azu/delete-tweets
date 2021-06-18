@@ -51,7 +51,7 @@ describe("convertToLineTweet", function () {
             favorite_count: 2,
             id: "783296194701172736",
             retweet_count: 0,
-            text: '週一更新のJavaScript情報サイト "http://JSer.info" https:/https://jser.info/cript #JSer',
+            text: '週一更新のJavaScript情報サイト "http://JSer.info" https://jser.info/ #JavaScript #JSer',
             timestamp: 1475587340000
         });
     });
@@ -104,6 +104,56 @@ describe("convertToLineTweet", function () {
             id: "1387887489285693441",
             text: "RT @BenLesh: #RxJS 7.0.0 has been published! 🥳🎉🎉\n\nhttp://rxjs.dev updated! (you may have to empty cache and hard reload because ser…",
             timestamp: 1619733137000
+        });
+    });
+    it("can convert tweet when includes multiple urls", () => {
+        const result = convertArchieveToLineTweet({
+            retweeted: false,
+            source: '<a href="http://twitter.com" rel="nofollow">Twitter Web Client</a>',
+            entities: {
+                hashtags: [],
+                symbols: [],
+                user_mentions: [],
+                urls: [
+                    {
+                        url: "https://t.co/aWDzsDBbkV",
+                        expanded_url: "https://github.com/asciidwango/js-primer/tree/presentations/meetings/2015-12-17",
+                        display_url: "github.com/asciidwango/js…",
+                        indices: ["65", "88"]
+                    },
+                    {
+                        url: "https://t.co/AoX8yWtsFx",
+                        expanded_url:
+                            "https://github.com/asciidwango/js-primer/blob/presentations/presentations/introduction.md",
+                        display_url: "github.com/asciidwango/js…",
+                        indices: ["160", "183"]
+                    }
+                ]
+            },
+            display_text_range: ["0", "183"],
+            favorite_count: "19",
+            in_reply_to_status_id_str: "1109354918899404801",
+            id_str: "1110004457553580033",
+            in_reply_to_user_id: "14169633",
+            truncated: false,
+            retweet_count: "7",
+            id: "1110004457553580033",
+            in_reply_to_status_id: "1109354918899404801",
+            possibly_sensitive: false,
+            created_at: "Mon Mar 25 02:24:20 +0000 2019",
+            favorited: false,
+            full_text:
+                "js-primer は\n\n&gt; IT企業に新しく入った人にこれ読んでおいてと渡せるようなJavaScript入門書\n&gt; https://t.co/aWDzsDBbkV\n\nという感じで始まった書籍なので、そういう感じで使ってみてのフィードバックください。\n後、こういう話を会社で聞きたいとか興味ある人いますか?\nhttps://t.co/AoX8yWtsFx",
+            lang: "ja",
+            in_reply_to_screen_name: "azu_re",
+            in_reply_to_user_id_str: "14169633"
+        });
+        assert.deepStrictEqual(result, {
+            favorite_count: 19,
+            retweet_count: 7,
+            id: "1110004457553580033",
+            text: "js-primer は\n\n&gt; IT企業に新しく入った人にこれ読んでおいてと渡せるようなJavaScript入門書\n&gt; https://github.com/asciidwango/js-primer/tree/presentations/meetings/2015-12-17\n\nという感じで始まった書籍なので、そういう感じで使ってみてのフィードバックください。\n後、こういう話を会社で聞きたいとか興味ある人いますか?\nhttps://github.com/asciidwango/js-primer/blob/presentations/presentations/introduction.md",
+            timestamp: 1553480660000
         });
     });
 });
