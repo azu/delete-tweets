@@ -1,4 +1,4 @@
-# @azu/delete-tweets
+# delete-tweets
 
 Twitterのアーカイブから削除候補のTweetsを自動的に抽出する日本語の補助ツールと削除するツール。
 
