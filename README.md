@@ -13,6 +13,12 @@ Tweetsの削除と削除対象のフィルターをする日本語の補助ツ�
 - 削除済みの履歴を使った絞り込みのキャッシュ
   - Tweetsを削除して、辞書を更新して、また絞り込みと何度も繰り返し処理ができる
 
+## 必要なもの
+
+- Node.js 12+
+- [全ツイート履歴をダウンロードしたzipファイル](https://help.twitter.com/ja/managing-your-account/how-to-download-your-twitter-archive)
+- [Twitter V2 APIのクライアント](https://developer.twitter.com)のAPIキー
+
 ## Install
 
 [Yarn](https://classic.yarnpkg.com/en/)を使ってインストールして、`yarn bootstrap`を実行してください。
@@ -33,7 +39,7 @@ Tweetsの削除と削除対象のフィルターをする日本語の補助ツ�
 
 ### Import Archive
 
-1. [Twitter archive](https://help.twitter.com/en/managing-your-account/how-to-download-your-twitter-archive)を参考にTwitterのアーカイブをリクエストします
+1. [全ツイート履歴をダウンロードする方法](https://help.twitter.com/ja/managing-your-account/how-to-download-your-twitter-archive)を参考にTwitterのアーカイブをリクエストします
 2. Twitterのアーカイブ(`twitter-*.zip`)をダウンロードして展開します
 3. 中に含まれる `tweeet*.js` を `twitter-archives/` ディレクトリにコピーします
 
