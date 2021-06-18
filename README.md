@@ -115,7 +115,6 @@ Tweetsに含まれていたら削除対象とする辞書を定義します。
 
 ```yaml
 - エディター # 特定の単語はOK
-- ダークソウル
 - /ECMAScript \d+/ # 正規表現
 - /.*example\.com.*/ # example.com を含むならOK
 ```
