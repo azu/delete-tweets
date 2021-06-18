@@ -68,20 +68,22 @@ twitter-archives/
 
 `yarn detect`は `--fromDate YYYY-MM-DD` と `--toDate YYYY-MM-DD` で対象のTweetsの日付範囲を指定できます。
 
-削除候補を推定する実装アルゴリズム
+削除候補を推定する実装アルゴリズムは次の通りです。
 
 - [x] textlintでの[放送禁止用語](https://github.com/hata6502/textlint-rule-no-hoso-kinshi-yogo)、[不適切表現](https://github.com/textlint-ja/textlint-rule-ja-no-inappropriate-words)のチェック
 - [x] ネガティブ(感情極性値ベース)の推定
 - [x] ユーザー定義の許可リスト、不許可リスト
 
+[config.js](./config.js)でそれぞれの仕組みを利用するかの設定ができます。
+
 :memo: 基本的にfalse positiveを含んだ過剰な削除候補を作成します。削除候補をチェックして実際に削除する候補のみを `data/will-delete-tweets.json` に残してください。
 
 ユーザー定義の辞書で削除候補に追加、削除できます。
-次ののファイルに定義することで、自動的に`yarn detect`が処理します。
+次のファイルに定義することで、自動的に`yarn detect`が処理します。
 
 #### `allow-id.yaml`
 
-削除しないTweetsの`id`を指定できます。
+削除しないTweetの`id`を指定できます。
 
 たとえば、`https://twitter.com/twitter/status/123456765432` を削除対象から外す場合は次のように定義できます。
 

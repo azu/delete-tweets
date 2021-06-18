@@ -15,6 +15,7 @@ import analyze from "negaposi-analyzer-ja";
 import path from "path";
 import fsStream from "fs";
 import { fileURLToPath } from "url";
+import { config } from "../config.js";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const kernel = new TextlintKernel();
@@ -23,7 +24,12 @@ const kernel = new TextlintKernel();
  * @param {import("./types/output.ts").LineTweet} tweet
  * @returns {Promise<import(("./detect.ts").CheckResult>}
  */
-const textlint = (tweet) => {
+const textlint = async (tweet) => {
+    if (!config.textlint.enabled) {
+        return {
+            ok: true
+        };
+    }
     return kernel.lintText(tweet.text, {
         ext: ".txt",
         filePath: tweet.id + ".txt",
@@ -70,6 +76,11 @@ const textlint = (tweet) => {
  * @returns {Promise<import(("./detect.ts").CheckResult>}
  */
 const checkNegaposi = async (tweet) => {
+    if (!config.negaposi.enabled) {
+        return {
+            ok: true
+        };
+    }
     if (!tweet.text) {
         return {
             ok: true
@@ -87,11 +98,11 @@ const checkNegaposi = async (tweet) => {
         // ネガティブな単語に対する補正値(スコアに乗算)
         negativeCorrections: 1
     });
-    if (score < -0.3) {
+    if (score < config.negaposi.minScore) {
         return {
             ok: false,
             score,
-            message: "感情極性値が0.3未満"
+            message: `感情極性値が${config.negaposi.minScore}未満`
         };
     }
     return {
@@ -129,6 +140,11 @@ const DISALLOW_LIST = (() => {
  * @returns {Promise<import(("./detect.ts").CheckResult>}
  */
 const checkDisallow = async (tweet) => {
+    if (!config.dictionary.enabled) {
+        return {
+            ok: true
+        };
+    }
     if (DISALLOW_LIST.length === 0) {
         return {
             ok: true
