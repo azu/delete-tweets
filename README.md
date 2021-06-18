@@ -225,6 +225,10 @@ echo "いやらしい文章" | yarn test-detect
 
  ```
 
+## Related
+
+- [azu/mytweets: Search your all tweets.](https://github.com/azu/mytweets#schedule-updating)
+
 ## Changelog
 
 See [Releases page](https://github.com/azu/delete-tweets/releases).
