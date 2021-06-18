@@ -204,6 +204,12 @@ Show specific reason
 cat data/will-delete-tweets.json | jq -s 'group_by(.reason)[] | select(.[0].reason | contains("理由")) | .[].text'
 ```
 
+Show favorited sort
+
+```shell
+cat data/will-delete-tweets.json | jq -s "[group_by(.reason)[] | {favorite_count: .[0].favorite_count, tweet: .[0].text, count: length, reason: .[0].reason  }] | sort_by(.favorite_count) | reverse" | less
+```
+
 Remove specific errors
 
 ```shell
