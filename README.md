@@ -16,7 +16,7 @@ Twitterのアーカイブから削除候補のTweetsを抽出する補助ツー�
 
 ## 必要なもの
 
-- Node.js 12+
+- Node.js 18+
 - [全ツイート履歴をダウンロードしたzipファイル](https://help.twitter.com/ja/managing-your-account/how-to-download-your-twitter-archive)
 - [Twitter V2 APIのクライアント](https://developer.twitter.com)のAPIキー
 
