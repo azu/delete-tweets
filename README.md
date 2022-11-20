@@ -186,6 +186,12 @@ TwitterのAPIを大量に叩く可能性があるので、自己責任で実行�
 cat data/will-delete-tweets.json | jq -s ".[].text"
 ```
 
+Count will delete tweets:
+
+```
+cat data/will-delete-tweets.json | wc -l
+```
+
 Group by error's `reason`:
 
 ```shell
@@ -222,8 +228,7 @@ Test a text from stdin
 echo "いやらしい文章" | yarn test-detect
 # 感情極性値が0.3未満
 # [ 'textlint-rule-ja-no-inappropriate-words: 不適切表現「いやらしい」が含まれています。' ]
-
- ```
+```
 
 ## Related
 

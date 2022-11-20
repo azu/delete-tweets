@@ -34,10 +34,10 @@
   ],
   "scripts": {
     "bootstrap": "download-negaposi-dict && node bootstrap.js",
-    "import-twitter-archives": "node --loader ts-node/esm ./scripts/import-twitter-archives.ts",
-    "detect": "node --loader ts-node/esm ./scripts/detect.ts",
-    "delete-tweets": "node --loader ts-node/esm ./scripts/delete-tweets.ts",
-    "test-detect": "node --loader ts-node/esm ./scripts/test-detect.ts",
+    "import-twitter-archives": "ts-node-esm ./scripts/import-twitter-archives.ts",
+    "detect": "ts-node-esm ./scripts/detect.ts",
+    "delete-tweets": "ts-node-esm ./scripts/delete-tweets.ts",
+    "test-detect": "ts-node-esm ./scripts/test-detect.ts",
     "test": "mocha",
     "format": "prettier --write \"**/*.{js,jsx,ts,tsx,css}\"",
     "prepare": "git config --local core.hooksPath .githooks",
@@ -92,7 +92,6 @@
     "textlint-filter-rule-allowlist": "^3.0.0",
     "textlint-rule-ja-no-inappropriate-words": "^2.0.0",
     "textlint-rule-no-hoso-kinshi-yogo": "^1.3.2",
-    "twitter-api-v2": "^1.12.0",
-    "yarn": "^1.22.18"
+    "twitter-api-v2": "^1.12.0"
   }
 }
