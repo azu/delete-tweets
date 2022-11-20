@@ -48,16 +48,16 @@ const waitFor = (ms: number) => {
 };
 
 export async function deleteTweets(tweetsJsonFilePath: string, deletedTweetsFilePath: string) {
-    const twitter = new TwitterApi({
+    const client = new TwitterApi({
         appKey: process.env.TWITTER_APP_KEY!,
         appSecret: process.env.TWITTER_APP_SECRET!,
         accessToken: process.env.TWITTER_ACCESS_TOKEN!,
         accessSecret: process.env.TWITTER_ACCESS_SECRET!
-    }).readWrite;
+    });
     const deleteTweet = async (tweet: ToDeleteTweetLine) => {
         try {
-            await twitter.v1.post(`statuses/destroy/${tweet.id}.json`);
-        } catch (error) {
+            await client.v2.delete(tweet.id);
+        } catch (error: any) {
             if (error.code === 404) {
                 return; // already deleted
             }
