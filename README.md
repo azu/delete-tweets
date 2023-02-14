@@ -24,8 +24,10 @@ Twitterのアーカイブから削除候補のTweetsを抽出する補助ツー�
 
 [Yarn](https://classic.yarnpkg.com/en/)を使ってインストールして、`yarn bootstrap`を実行してください。
 
-    yarn install
-    yarn bootstrap
+```
+yarn install
+yarn bootstrap
+```
 
 ## Usage
 
@@ -53,7 +55,9 @@ twitter-archives/
 
 4. 次のコマンドを実行して、`tweet*.js` をインポートして `data/tweets.json` を作成します
 
-    yarn import-twitter-archives
+```
+yarn import-twitter-archives
+```
 
 ### Detect Tweets
 
