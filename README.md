@@ -63,8 +63,8 @@ yarn import-twitter-archives
 
 `yarn detect` コマンドで、削除候補のTweetsデータを `data/will-delete-tweets.json` として作成できます。
 
-    # all tweets
-    yarn detect
+    # 全ての期間を対象にする
+    $ yarn detect
     # 2015-01-01 ~ Now
     $ yarn detect --fromDate 2015-01-01
     # 2015-01-01 ~ 2016-01-01
